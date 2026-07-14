@@ -39,6 +39,9 @@ def load_new_results():
         if os.path.exists(p):
             frames.append(pd.read_csv(p))
     df = pd.concat(frames, ignore_index=True)
+    # results_exp_I_edsr.csv rows were merged into results_exp_I.csv once the
+    # EDSR run finished; drop the duplicates so n is correct.
+    df = df.drop_duplicates(subset=["image", "alpha", "model"], keep="first")
     df["attack_name"] = df["model"] + "_x4"
     return df
 

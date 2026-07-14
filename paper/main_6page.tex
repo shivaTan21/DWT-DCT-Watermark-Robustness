@@ -1,0 +1,779 @@
+\documentclass[conference]{IEEEtran}
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{url}
+
+\begin{document}
+
+\title{DWT-DCT Watermark Design Under AI-Based Image Enhancement}
+
+\author{\IEEEauthorblockN{Shiva Tan}
+\IEEEauthorblockA{Independent Researcher\\
+shivatan21@gmail.com}}
+
+\maketitle
+
+\begin{abstract}
+Classical DWT-DCT image watermarking has traditionally been evaluated
+against compression, filtering, and noise-based attacks, where watermark
+degradation is closely coupled with visible image distortion. We
+investigate whether AI-based image enhancement introduces a fundamentally
+different robustness challenge. Across 100 images from the Kodak and
+TAMPERE17 datasets at four embedding strengths, Real-ESRGAN reduces mean
+normalized correlation (NC) from 0.999 to 0.795 while maintaining the
+highest perceptual quality among all watermark-degrading attacks
+evaluated (SSIM 0.885);
+ESPCN, FSRCNN, and LapSRN, sharing the identical $4\times$ upscale and
+Lanczos downscale pipeline, preserve watermark recovery
+(NC $\geq 0.999$), indicating that degradation arises from a specific
+class of learned reconstruction rather than from resampling or learned
+super-resolution per se. Coefficient-level analysis across 102,400 DCT blocks reveals
+markedly different perturbation profiles for Real-ESRGAN and JPEG
+compression, with strongly opposing coefficient rankings (Spearman
+$\rho = -0.716$ vs.\ empirically measured JPEG damage; $\rho = -0.907$
+vs.\ the JPEG quantization table). An exhaustive search over 1,953
+coefficient pairs identifies a 37-pair Pareto frontier and establishes
+that no pair simultaneously optimizes robustness to both attacks. A
+three-pair head-to-head validation across all 100 images at four
+embedding strengths confirms strongly attack-specific ordering: the
+high-frequency pair $(7,5)/(7,7)$ achieves the highest Real-ESRGAN NC
+(0.831 vs.\ 0.783 for the standard pair), while the analytically
+balanced pair $(2,3)/(3,2)$ achieves the highest JPEG NC (0.998); its
+Real-ESRGAN comparison is non-final due to an identified and controlled
+attack-pipeline inconsistency, pending a full rerun. A decision-margin
+analysis over 307,200 embedded blocks characterizes the mechanism: the
+perturbation is anti-correlated with the embedded coefficient shift,
+removing 30--53\% of the embedded coefficient differential and moving
+each block toward its natural coefficient ordering --- behavior
+consistent with an \emph{endogenous restoration} process rather than
+exogenous noise --- and 77--91\% of bit flips occur in blocks whose
+natural ordering opposes the embedded bit. PSNR-oriented
+super-resolution models show the same perturbation direction at
+magnitudes an order of magnitude below the enforced decision margin,
+consistent with why they leave the watermark intact.
+The ESRGAN/JPEG anti-complementarity pattern is stable across embedding
+strengths $\alpha \in \{0.05, 0.10, 0.20, 0.30\}$ (Spearman $\rho$
+range $\leq 0.010$; Jaccard of top-10 damaged positions $= 1.0$).
+These findings establish that attack-aware coefficient selection is
+necessary but cannot simultaneously optimize against both
+AI-enhancement and JPEG attacks within this scheme.
+\end{abstract}
+
+\begin{IEEEkeywords}
+digital watermarking, DWT-DCT, image forensics, robustness evaluation,
+super-resolution, AI enhancement, Real-ESRGAN, coefficient selection
+\end{IEEEkeywords}
+
+\section{Introduction}
+\label{sec:intro}
+
+Robustness evaluation for classical image watermarking rests on a
+quality--attack tradeoff: the standard benchmark attacks --- JPEG
+compression, additive noise, filtering, geometric distortion
+\cite{petitcolas1998,cox2007} --- all degrade image quality in
+proportion to the damage they inflict on the watermark. An attacker
+who wishes to remove a watermark must accept perceptible image damage.
+This assumption is not incidental; it directly informs how embedding
+positions and strengths are chosen in deployed systems, and it defines
+what ``robust'' has meant in three decades of evaluation practice.
+
+This paper asks a single question: \emph{does consumer AI-based image
+enhancement violate this assumption for classical DWT-DCT watermarking
+--- and if so, why, and what can be done about it within the classical
+scheme?}
+
+The question is practically urgent. Combined DWT-DCT watermarking
+\cite{alhaj2007} remains a canonical choice in cameras, broadcast
+equipment, and digital asset management, valued for computational
+simplicity and independence from machine-learning infrastructure, and it
+continues to serve as the classical baseline in watermarking research
+\cite{waves2024}. Meanwhile, super-resolution models such as Real-ESRGAN
+\cite{realesrgan2021} are embedded in consumer photo tools. A user who
+``enhances'' a watermarked photograph may degrade the embedded signal
+with no forensic intent and --- critically --- no visible indication that
+anything was altered. Whether this constitutes a meaningful threat to
+deployed classical schemes has not been systematically studied: the WAVES
+benchmark \cite{waves2024} evaluated DWT-DCT only in an appendix and
+included no enhancement-class attacks; W-Bench \cite{wbench2024}
+evaluates only neural watermarks.
+
+We answer the question in four stages, which structure the paper.
+\emph{Observation} (Section~\ref{sec:results}): Real-ESRGAN reduces
+mean NC to 0.795 while achieving SSIM of 0.885, the highest perceptual
+quality of any watermark-degrading attack we test --- a combination
+absent from every classical attack profile. ESPCN~\cite{espcn2016},
+FSRCNN~\cite{fsrcnn2016}, and LapSRN~\cite{lapsrn2017}, passed through
+the identical upscale--downscale pipeline, leave watermarks intact,
+isolating the cause to the learned reconstruction of the GAN-trained
+restoration model rather than to learned super-resolution as a class.
+\emph{Mechanism} (Section~\ref{sec:analysis}): a stability analysis over
+102,400 DCT blocks shows Real-ESRGAN concentrates damage in the DC
+coefficient at 5--14$\times$ the magnitude of any other position, whereas
+JPEG distributes damage nearly uniformly, with opposing coefficient
+rankings (Spearman $\rho = -0.716$ to $-0.907$); a decision-margin
+analysis over 307,200 embedded blocks then shows that Real-ESRGAN's
+perturbation is anti-correlated with the embedded coefficient shift
+($r$ up to $-0.80$), removing 30--53\% of the embedded differential and
+moving each block toward its natural coefficient ordering --- behavior
+consistent with an \emph{endogenous} restoration process, in contrast
+to JPEG's exogenous quantization noise.
+\emph{Design implication and validation}
+(Section~\ref{sec:analysis}): an exhaustive search over 1,953 candidate
+pairs identifies the ESRGAN/JPEG Pareto frontier and the attack-specific
+structure of optimal positions; three-pair full validation on 100 images
+and four embedding strengths confirms large, statistically significant,
+attack-dependent NC differences.
+\emph{Stability} (Section~\ref{sec:analysis}): the damage-profile
+anti-complementarity is stable across all tested embedding strengths
+($\rho$ range $\leq 0.010$; position rank order perfectly preserved).
+
+Our contributions are:
+\begin{itemize}
+\item To the best of our knowledge, the first systematic evaluation of
+a classical DWT-DCT scheme under learned super-resolution, demonstrating
+that Real-ESRGAN exhibits a quality--robustness profile unreachable by
+classical attacks, with three PSNR-oriented models (ESPCN, FSRCNN,
+LapSRN) as pipeline controls attributing the effect to GAN-trained
+restoration rather than to learned super-resolution as a class.
+\item A mechanistic characterization showing Real-ESRGAN perturbs the
+DCT domain in a fundamentally different pattern than JPEG (DC-concentrated
+vs.\ uniform; $\rho \approx -0.9$ opposing rankings), which invalidates
+the coefficient-selection assumptions inherited from the compression era.
+\item A block-level decision-margin analysis showing that Real-ESRGAN's
+perturbation behaves as an \emph{endogenous, signal-dependent} attack:
+it selectively removes the coefficient differential the embedder
+inserted against natural-image statistics, concentrating failures (risk
+ratio 3.4--9.5$\times$) in blocks whose natural coefficient ordering
+opposes the embedded bit. The model explains per-pair flip rates to within
+1\,pp, explains why the high-frequency pair survives best (near-zero
+natural margins), and yields a new position-selection rule: minimize the
+natural margin $|M_{\mathrm{orig}}|$, not per-position damage.
+\item An exhaustive 1,953-pair Pareto analysis identifying the structure
+of the ESRGAN/JPEG robustness tradeoff, with full empirical validation
+showing strongly attack-dependent NC ordering: no coefficient pair
+simultaneously optimizes against both AI-enhancement and JPEG attacks.
+\item An embedding-strength stability result showing the ESRGAN/JPEG
+damage-profile anti-complementarity is stable across
+$\alpha \in \{0.05, 0.10, 0.20, 0.30\}$, indicating it is a structural
+property of the attacks rather than a tuning artifact.
+\end{itemize}
+
+Section~\ref{sec:related} reviews related work.
+Section~\ref{sec:background} summarizes the DWT-DCT scheme.
+Section~\ref{sec:setup} describes the experimental setup.
+Sections~\ref{sec:results} and~\ref{sec:analysis} present the
+observation, mechanism, and validation. Section~\ref{sec:conclusion}
+concludes.
+
+\section{Related Work}
+\label{sec:related}
+
+Transform-domain methods dominate invisible watermarking
+\cite{cox2007}, embedding in DCT \cite{piva1997}, DWT \cite{barni2001},
+or combined coefficients; Al-Haj \cite{alhaj2007} introduced the
+DWT-DCT scheme evaluated here, with later variants adding SVD
+\cite{navas2008} or optimized coefficient selection \cite{rijati2025}.
+Across this lineage, robustness evaluation follows the classical
+protocol of compression, noise, filtering, and geometric attacks
+\cite{petitcolas1998}; we are not aware of prior work evaluating
+classical frequency-domain watermarks against AI-based enhancement.
+The models we test span consumer-deployed GAN-trained blind restoration
+(Real-ESRGAN \cite{realesrgan2021}) and PSNR-oriented CNN
+super-resolvers trained against bicubic downsampling (ESPCN
+\cite{espcn2016}, FSRCNN \cite{fsrcnn2016}, LapSRN \cite{lapsrn2017});
+unlike regeneration attacks, these refine images in place while
+restructuring frequency content.
+
+On the neural side, HiDDeN \cite{hidden2018} and StegaStamp
+\cite{stegastamp2020} established learned encoder--decoder
+watermarking; W-Bench/VINE \cite{wbench2024} hardens neural watermarks
+against generative editing and SuperMark \cite{supermark2024} uses
+diffusion super-resolution as an embedding tool, while Zhao et
+al.~\cite{zhao2023} showed diffusion regeneration removes neural
+watermarks. The WAVES benchmark \cite{waves2024} systematized attacks
+for neural schemes but evaluated DWT-DCT only in an appendix, without
+enhancement-class attacks; the present work addresses that gap for
+classical schemes.
+
+\section{DWT-DCT Watermarking}
+\label{sec:background}
+
+\subsection{Scheme}
+The scheme is blind: extraction requires only the secret key, no
+reference image \cite{cox2007}. The host image is converted from RGB to
+YCbCr (ITU-R BT.601) and only the luminance channel $Y$ is modified. A
+single-level Haar DWT of $Y$ yields subbands LL/LH/HL/HH; the LL
+subband is partitioned into non-overlapping $8\times8$ blocks, each
+encoding one bit $b \in \{0,1\}$ via 2D DCT by enforcing a relative
+ordering between the coefficients at positions $(r_1,c_1)$ and
+$(r_2,c_2)$ with margin $\delta$:
+\begin{align}
+b=1:\; & C(r_1,c_1) \leftarrow \max\!\big(C(r_1,c_1),\, C(r_2,c_2)+\delta\big) \\
+b=0:\; & C(r_2,c_2) \leftarrow \max\!\big(C(r_2,c_2),\, C(r_1,c_1)+\delta\big)
+\end{align}
+Extraction applies the same transforms to the (possibly attacked)
+image and reads $\hat{b} = 1$ if $C(r_1,c_1) > C(r_2,c_2)$, else
+$\hat{b} = 0$.
+
+\subsection{Parameters and Metrics}
+Baseline positions are $(r_1,c_1)=(4,1)$, $(r_2,c_2)=(1,4)$ with
+$\delta=30.0$; a 1024-bit ($32\times32$) watermark is embedded with
+fixed seed 42.
+Four strength multipliers $\alpha \in \{0.05, 0.1, 0.2, 0.3\}$ are
+evaluated. Recovery is measured by normalized correlation (NC) between
+the original watermark $w$ and extracted $\hat{w}$, both mapped to
+$\{-1,+1\}$:
+\begin{equation}
+\mathrm{NC} = \frac{w \cdot \hat{w}}{\lVert w \rVert\, \lVert \hat{w} \rVert}
+\end{equation}
+NC $= 1.0$ indicates perfect recovery; NC $\approx 0$ indicates
+chance-level extraction.
+
+\section{Experimental Setup}
+\label{sec:setup}
+
+\subsection{Dataset}
+100 images: 24 from the Kodak suite \cite{kodak} and 76 from the
+TAMPERE17 noise-free database \cite{tampere17}, all resized to
+$512\times512$ RGB.
+
+\subsection{Attack Conditions}
+\textbf{Classical attacks.} JPEG quality 50 (JPEG-Q50), Gaussian noise
+($\sigma=10$), $3\times3$ median filter, $5\times5$ Gaussian blur, and
+80\% crop with resize to $512\times512$.
+
+\textbf{AI enhancement attacks.} Real-ESRGAN \cite{realesrgan2021},
+ESPCN \cite{espcn2016}, FSRCNN \cite{fsrcnn2016}, and LapSRN
+\cite{lapsrn2017}. All upscale watermarked images $4\times$ to
+$2048\times2048$ and resize back to $512\times512$ via Lanczos
+resampling. Because all attacks share this identical wrapper and differ
+only in the enhancement network, the three PSNR-oriented models serve as
+\emph{pipeline controls}: differences in watermark damage are
+attributable to the learned reconstruction, not to resampling.
+
+\subsection{Coefficient Pair Analysis}
+\textbf{DCT stability analysis.} We apply DWT and $8\times8$ block DCT
+to each watermarked image and its Real-ESRGAN-enhanced counterpart at
+$\alpha=0.1$, computing mean absolute coefficient difference per position
+across 102,400 blocks total; repeated for JPEG-Q50.
+
+\textbf{Exhaustive pair search.} We test all 1,953 valid coefficient
+pair configurations (positions from the upper-left $7\times7$ submatrix
+of the $8\times8$ DCT block, excluding the DC coefficient and requiring
+pair asymmetry). Each pair is evaluated for estimated ESRGAN robustness
+(E-score, based on damage profile) and JPEG robustness (J-score, based
+on JPEG quantization step). Pareto-optimal pairs are identified across
+both objectives.
+
+\textbf{Three-pair full validation.} We select three pairs spanning the
+Pareto frontier for end-to-end head-to-head comparison: the standard
+baseline pair $(4,1)/(1,4)$, the analytically Pareto-optimal balanced
+pair $(2,3)/(3,2)$, and the high-frequency pair $(7,5)/(7,7)$ with the
+strongest predicted ESRGAN robustness. Each is evaluated across all 100
+images and four $\alpha$ values under four attacks (none, Real-ESRGAN,
+JPEG-Q50, Gaussian blur). Pairwise NC differences are assessed with
+Wilcoxon signed-rank tests (Shapiro-Wilk normality pre-check); $p$-values
+are adjusted using the Benjamini-Hochberg false discovery rate (BH-FDR)
+procedure across all 16 test conditions.
+
+\subsection{Metrics and Implementation}
+NC and BER are computed on the extracted bit-grid; PSNR and SSIM
+\cite{ssim2004} are computed on the full RGB images (channel-averaged
+SSIM), per image per attack, averaged across 100 images. Implementation uses
+PyTorch, PyWavelets, and OpenCV on Apple M2 hardware; Real-ESRGAN via
+the \texttt{py-real-esrgan} package; ESPCN via OpenCV DNN
+Super-Resolution ($4\times$). Code is available at [REPO].
+
+\section{Results: The Quality--Watermark Asymmetry}
+\label{sec:results}
+
+% SOURCE: results/summary_table.csv (standard embedding variant, n=400 =
+%   100 images x 4 alphas per attack; src/run_experiment.py, baseline runs)
+%   and experiments/exp_I_sr_model_generalization/results_exp_I.csv
+%   (FSRCNN/LapSRN rows, n=400 each; Exp I run_exp_I.py).
+% PSNR/SSIM computed on full RGB vs. the original image (src/metrics.py).
+% Regenerated 2026-07-14 per AUDIT_REPORT.md Sec. 6.
+\begin{table}[t]
+\caption{Mean watermark survival and image quality by attack, averaged
+across 100 images and four embedding strengths (standard pair). NC and
+BER measure watermark recovery; PSNR and SSIM measure perceptual
+quality relative to the original image.}
+\label{tab:survival}
+\centering
+\begin{tabular}{lcccc}
+\toprule
+Attack & NC & BER & PSNR & SSIM \\
+\midrule
+Watermarked only       & 0.9998  & 0.0001 & 40.4 & 0.981 \\
+Gaussian noise         & 0.9986  & 0.0007 & 27.9 & 0.702 \\
+JPEG-Q50               & 0.9956  & 0.0022 & 30.2 & 0.861 \\
+Gaussian blur          & 0.9215  & 0.0392 & 28.7 & 0.843 \\
+Median filter          & 0.8916  & 0.0542 & 29.7 & 0.849 \\
+Crop-Resize            & $-0.0097$ & 0.5049 & 14.1 & 0.278 \\
+ESPCN $4\times$        & 0.9993  & 0.0004 & 39.4 & 0.978 \\
+FSRCNN $4\times$       & 0.9996  & 0.0002 & 38.9 & 0.977 \\
+LapSRN $4\times$       & 0.9994  & 0.0003 & 39.1 & 0.978 \\
+Real-ESRGAN $4\times$  & 0.7948  & 0.1026 & 29.2 & 0.885 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Watermark Survival Under Attack}
+Table~\ref{tab:survival} reports mean NC, BER, PSNR, and SSIM.
+Classical signal-processing attacks leave watermarks largely intact:
+Gaussian noise and JPEG-Q50 produce NC above 0.99, consistent with prior
+DWT-DCT evaluations \cite{alhaj2007}; blur and median filtering cause
+moderate degradation (0.922, 0.892); Crop-Resize destroys the watermark
+(NC $\approx -0.01$, chance-level), consistent with the known
+vulnerability of block-aligned schemes to geometric desynchronization.
+
+The enhancement attacks diverge sharply. All three PSNR-oriented
+super-resolution models leave watermarks indistinguishable from the
+unattacked baseline: ESPCN, FSRCNN, and LapSRN achieve NC $\geq 0.999$
+at every embedding strength (FSRCNN 0.9996, LapSRN 0.9994 pooled over
+400 image--strength combinations each). Real-ESRGAN --- the only
+GAN-trained blind-restoration model in the set --- reduces mean NC to
+0.795 with BER 0.103 --- more destructive than any classical attack
+except Crop-Resize --- while simultaneously achieving SSIM of 0.885, the
+highest perceptual quality of any watermark-degrading attack in our
+evaluation. Because all
+four models share the identical resampling wrapper, this contrast
+indicates the damage arises from Real-ESRGAN's learned reconstruction:
+AI enhancement is not inherently threatening, and learned
+super-resolution as a class is not the threat; the threat is specific to
+restoration-oriented, GAN-trained architectures.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{figures/ssim_vs_nc.png}
+\caption{SSIM vs.\ NC per attacked image. Real-ESRGAN occupies a
+high-SSIM, low-NC region unreachable by any classical attack; ESPCN
+clusters near $\mathrm{NC}=1.0$ at high SSIM.}
+\label{fig:asymmetry}
+\end{figure}
+
+\subsection{The Quality--Watermark Asymmetry}
+Figure~\ref{fig:asymmetry} shows the central observation. Every
+classical attack that reduces NC also reduces SSIM: watermark damage is
+coupled to visible quality damage. Real-ESRGAN decouples them, occupying
+a high-quality, low-detection region that no classical attack reaches.
+Operationally, a content owner monitoring watermark integrity would
+observe degraded detection with no visible indication that the image had
+been modified --- a qualitatively distinct threat from classical attacks.
+
+\subsection{Embedding Strength Does Not Restore Robustness}
+% SOURCE: results/metrics.csv (standard variant, attack real_esrgan,
+%   100 images per alpha; src/run_experiment.py, pipeline P1).
+% Regenerated 2026-07-14 per AUDIT_REPORT.md Sec. 6 (previous values were
+%   from an unidentifiable earlier run; SSIM was a Kodak-only aggregate).
+\begin{table}[t]
+\caption{Mean NC under Real-ESRGAN by embedding strength $\alpha$,
+standard pair $(4,1)/(1,4)$, averaged across 100 images.}
+\label{tab:alpha_main}
+\centering
+\begin{tabular}{ccc}
+\toprule
+$\alpha$ & NC (Real-ESRGAN) & SSIM \\
+\midrule
+0.05 & 0.774 & 0.886 \\
+0.10 & 0.783 & 0.885 \\
+0.20 & 0.802 & 0.885 \\
+0.30 & 0.820 & 0.884 \\
+\bottomrule
+\end{tabular}
+\end{table}
+Table~\ref{tab:alpha_main} shows NC improves only marginally
+($+0.046$) as $\alpha$ increases sixfold from 0.05 to 0.30, while SSIM
+remains flat. For classical
+attacks, stronger embedding produces proportionally better survival;
+Real-ESRGAN does not exhibit this behavior, consistent with the model
+overwriting DCT coefficient relationships during reconstruction rather
+than merely attenuating the embedded signal.
+
+\section{Mechanism and Mitigation}
+\label{sec:analysis}
+
+\subsection{DCT Coefficient Damage Profiles}
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{figures/dct_stability_comparison.png}
+\caption{Mean absolute DCT coefficient perturbation per position for
+Real-ESRGAN (left) and JPEG-Q50 (right) across 102,400 blocks, shared
+color scale. Real-ESRGAN concentrates damage in the DC coefficient;
+JPEG distributes damage nearly uniformly. Baseline embedding positions
+$(4,1)$ and $(1,4)$ are marked.}
+\label{fig:heatmap}
+\end{figure}
+
+Figure~\ref{fig:heatmap} shows mean absolute perturbation per DCT
+position. Real-ESRGAN concentrates damage almost entirely in the DC
+coefficient at $(0,0)$: its mean perturbation is $5.3\times$ that of the
+most-damaged non-DC position and $14\times$ the median non-DC position,
+with elevated perturbation extending
+into the low- and mid-frequency region. This pattern is consistent with
+the learned reconstruction re-rendering local luminance statistics; it
+cannot be attributed to resampling, since ESPCN shares that pipeline and
+leaves extraction nearly perfect. JPEG-Q50 distributes damage across all
+64 positions in a narrow range with mild elevation at higher frequencies,
+consistent with its quantization table design.
+
+The two profiles are strongly anti-complementary: Spearman rank
+correlation between the per-position ESRGAN and JPEG damage profiles,
+measured on the $\alpha$-resolved profiles of the embedding-strength
+stability analysis below, is
+$\rho = -0.716$ ($p < 10^{-10}$), and between the ESRGAN damage profile
+and the JPEG quantization step-size vector is $\rho = -0.907$
+($p < 10^{-25}$). Positions most damaged by ESRGAN tend to be positions
+least damaged by JPEG, and vice versa. This anti-complementarity means
+that for any given pair $(r_1,c_1)/(r_2,c_2)$, improving robustness to
+one attack by choosing positions where it causes less relative damage
+tends to hurt robustness to the other attack.
+
+The classical embedding positions $(4,1)$ and $(1,4)$ sit in a
+mid-frequency zone where Real-ESRGAN's perturbation is elevated relative
+to the most stable high-frequency corner positions. The
+coefficient-selection assumptions inherited from the compression era do
+not transfer to the enhancement threat.
+
+\subsection{Exhaustive Pair Search and Pareto Frontier}
+
+To characterize the structure of the ESRGAN/JPEG tradeoff, we compute
+robustness scores for all 1,953 valid coefficient pairs derived from the
+upper-left $7\times7$ submatrix of the DCT block. For each pair, an
+E-score summarizes predicted ESRGAN stability (based on the damage
+profile) and a J-score summarizes predicted JPEG robustness (based on
+the JPEG quantization table). The Pareto frontier --- pairs no other
+configuration dominates on both objectives simultaneously --- contains
+37 pairs out of 1,953. The standard baseline pair $(4,1)/(1,4)$ lies
+off the Pareto frontier (E-score $= 0.028$, J-score $= 0.877$),
+confirming it is not optimal under either attack in isolation or their
+combination.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{figures/frequency_sweep_heatmap.png}
+\caption{Real-ESRGAN NC vs.\ JPEG-Q50 NC per coefficient pair. The
+Pareto frontier (upper-right boundary) shows no pair simultaneously
+maximizes both. Pairs anchored near the high-frequency corner $(7,7)$
+achieve highest ESRGAN NC; pairs in the mid-frequency band achieve
+highest JPEG NC.}
+\label{fig:pareto}
+\end{figure}
+
+The anti-complementarity of the damage profiles is directly reflected in
+the Pareto plot (Figure~\ref{fig:pareto}): the ESRGAN NC and JPEG NC of
+individual pairs are negatively correlated (Spearman $\rho = -0.488$,
+$p < 0.001$) across the 43 screened pairs. No pair improves against both
+attacks simultaneously relative to the baseline.
+
+\subsection{Three-Pair Full Validation}
+\label{sec:pairs}
+
+We select three pairs spanning the Pareto frontier for end-to-end
+validation: the standard pair $(4,1)/(1,4)$, the analytically
+Pareto-optimal pair $(2,3)/(3,2)$ (highest combined E+J score among the
+37 Pareto-optimal pairs), and the high-frequency pair $(7,5)/(7,7)$
+(highest predicted ESRGAN robustness). Each pair is evaluated across all
+100 images at all four $\alpha$ values under four attack conditions.
+Table~\ref{tab:pairs} shows results at $\alpha=0.10$.
+
+% SOURCE: experiments/exp_F_realesrgan_pair_verification/exp_F_summary.csv
+%   (nc_mean/nc_std/psnr_mean at alpha=0.10) and exp_F_tests.csv
+%   (Wilcoxon BH-FDR statistics); Exp F run_exp_F.py.
+% NOTE (AUDIT_REPORT.md Sec. 1/5): the balanced Real-ESRGAN arm used the
+%   harsher live patch pipeline (P2); standard/HF used the disk pipeline
+%   (P1). Cross-column ESRGAN comparison involving "balanced" is therefore
+%   NOT like-for-like; see dagger note and text.
+\begin{table}[t]
+\caption{Mean NC $\pm$ standard deviation at $\alpha=0.10$ across 100
+images for three coefficient pairs under four attack conditions.
+All pairwise NC differences across all attack/pair combinations are
+statistically significant after BH--FDR correction except no-attack
+comparisons ($p < 10^{-12}$ or n.s.\ as indicated). $^\dagger$The
+balanced pair's Real-ESRGAN images were produced by a patch-based
+invocation of the attack that is measurably harsher than the whole-image
+invocation used for the other two pairs; see the like-for-like control
+in the text before comparing this value across columns.}
+\label{tab:pairs}
+\centering
+\begin{tabular}{lccc}
+\toprule
+Attack & Standard & Balanced & HF \\
+       & $(4,1)/(1,4)$ & $(2,3)/(3,2)$ & $(7,5)/(7,7)$ \\
+\midrule
+No attack      & $0.9997 \pm 0.000$ & $0.9997 \pm 0.000$ & $1.000 \pm 0.000$ \\
+Real-ESRGAN    & $0.783 \pm 0.124$ & $0.683 \pm 0.139^\dagger$   & $0.831 \pm 0.109$ \\
+JPEG-Q50       & $0.995 \pm 0.004$ & $0.998 \pm 0.001$   & $0.902 \pm 0.018$ \\
+Gaussian blur  & $0.910 \pm 0.013$ & $0.933 \pm 0.011$   & $0.977 \pm 0.005$ \\
+\midrule
+PSNR (dB)      & $40.6$ & $40.9$ & $43.9$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Real-ESRGAN.} The HF pair achieves NC of 0.831, 0.048 above
+standard ($p < 10^{-13}$, $d = 0.89$), a difference stable across all
+four embedding strengths. The balanced pair's tabulated value (0.683)
+must be read with care: its Real-ESRGAN images were generated by a
+patch-based invocation of the attack, whereas the standard and HF images
+used the whole-image invocation, and a control experiment shows the
+patch-based pipeline alone is substantially harsher (running the
+\emph{standard} pair through it costs $-0.102$ NC on the same
+watermarked images; $n=20$, Wilcoxon $p=10^{-4}$) --- almost exactly the
+apparent balanced--standard gap. This pipeline inconsistency in the
+original validation run was identified by the decision-margin control
+experiment of Section~\ref{sec:margin}. Under a like-for-like pipeline
+the balanced pair does \emph{not} underperform the standard pair; it is
+marginally better ($+0.020$, $n=20$, $p=0.038$), with HF best under
+both pipelines. We therefore do not present the balanced-pair
+Real-ESRGAN comparison as a final result: a like-for-like rerun of the
+balanced arm on all 100 images is required before camera-ready, and the
+tabulated 0.683 should be read only as an upper bound on the harsher
+pipeline's effect. What can be concluded already is that the
+analytically predicted \emph{large} advantage of the balanced pair
+fails to materialize under either pipeline; the next subsection
+diagnoses why.
+
+\textbf{JPEG-Q50.} The ordering reverses: Balanced ($0.998$) $>$ Standard
+($0.995$) $\gg$ HF ($0.902$). The HF pair suffers a large JPEG regression
+($\Delta\mathrm{NC} = -0.094$ vs.\ standard, $p < 10^{-17}$).
+
+\textbf{Gaussian blur.} Ordering follows ESRGAN: HF ($0.977$) $>$
+Balanced ($0.933$) $>$ Standard ($0.910$); all differences are large and
+highly significant.
+
+\textbf{Imperceptibility.} The balanced pair achieves higher PSNR
+($+0.30$\,dB at $\alpha=0.10$), and the HF pair achieves substantially
+higher PSNR ($+3.3$\,dB), eliminating below-threshold imperceptibility
+failures present in the standard pair.
+
+\textbf{Key finding.} No pair simultaneously achieves the highest NC
+across all attacks. The analytical Pareto ranking is not preserved in
+magnitude in end-to-end evaluation: the pair predicted to be the best
+combined choice (balanced, $(2,3)/(3,2)$) delivers only a $+0.02$
+like-for-like improvement over the standard pair under Real-ESRGAN
+($n=20$ control; full rerun pending),
+far short of the analytically predicted gap, while the HF pair ---
+selected by a simpler per-position damage heuristic --- outperforms
+both. Embedding position selection offers attack-aware partial
+mitigation, but the ESRGAN/JPEG tradeoff cannot be resolved within this
+scheme.
+
+\subsection{Why the Analytical Ranking Fails: Enhancement as Endogenous
+Restoration}
+\label{sec:margin}
+
+To diagnose the failure of the damage-based analytical ranking, we
+measure the detector's decision statistic directly: survival is
+governed by the signed margin $M = C_1 - C_2$, measured per block
+before and after Real-ESRGAN for all three pairs at $\alpha = 0.10$
+(307,200 blocks), together with each block's \emph{natural} margin
+$M_{\mathrm{orig}}$ in the unwatermarked original. NC loss is entirely
+margin sign flips (flip and bit-error rates agree to within 0.1\%);
+the embedding's margin floor clamps $|M|$ near 30 for all pairs, and
+pre-attack margin magnitude predicts nothing (Spearman
+$\rho \approx -0.07$, n.s.). The best image-level predictor of NC is
+the standard deviation of the \emph{differential} perturbation
+$\sigma(\Delta C_1 - \Delta C_2)$ ($\rho = -0.887$), outperforming the
+absolute per-coefficient damage used by the analytical E-score
+($\rho = -0.825$); common-mode perturbation, to which the comparison
+detector is blind by design, is irrelevant ($\rho = -0.22$).
+
+The perturbation is \emph{signal-dependent}: it is anti-correlated
+with the embedding-induced margin shift
+($r = -0.73 / -0.60 / -0.80$ for standard/balanced/HF), removes
+32\%/30\%/53\% of what the embedder inserted, and adding
+$M_{\mathrm{orig}}$ to a before-only regression of the post-attack
+margin raises $R^2$ from 0.71 to 0.83 (standard pair). This behavior
+is inconsistent with fixed, position-dependent noise and is consistent
+with learned image restoration reducing the artificial coefficient
+relationships introduced by comparison-based embedding --- an
+\emph{endogenous} restoration process; we characterize the model's
+input--output behavior only and make no claim about its internal
+computations.
+
+Consequently, the watermark dies where it fought nature: blocks whose
+natural ordering opposes the embedded bit flip at 3.4--9.5$\times$ the
+rate of agreeing blocks, and 77--91\% of all flips occur in that
+$\approx$50\% of blocks. This suggests why the HF pair survives best
+despite the largest restoration fraction (53\%): its natural margins
+are tiny (mean $|M_{\mathrm{orig}}| = 10.1$ vs.\ $\approx 31$ for the
+other pairs), consistent with a restoration process having little to
+restore against the embedded ordering. The governing quantity for
+position selection is thus the \emph{differential perturbation of the
+embedded coefficient pair}, not per-position exogenous damage. Full
+derivations and additional analyses appear in the extended version.
+
+\subsection{Generalization Across Super-Resolution Architectures}
+\label{sec:generalization}
+
+% SOURCE: experiments/exp_I_sr_model_generalization/
+%   {mechanism_summary_exp_I.csv, restoration_regression_exp_I.csv}
+%   (Exp I analyze_exp_I.py). Real-ESRGAN row = frozen Exp H standard-pair
+%   rows (block_margins.csv, pipeline P1), not recomputed.
+\begin{table}[t]
+\caption{Margin-analysis mechanism quantities per SR model (standard
+pair, $\alpha=0.10$, 102,400 blocks per model). $k$ = fraction of the
+embedded coefficient differential removed; $r_{\mathrm{undo}}$ =
+correlation between differential perturbation and embedded shift.}
+\label{tab:mechanism}
+\centering
+\begin{tabular}{lcccc}
+\toprule
+Model & Flip rate & $\sigma(\Delta C_1{-}\Delta C_2)$ & $k$ & $r_{\mathrm{undo}}$ \\
+\midrule
+ESPCN $4\times$       & 0.02\% & 1.9  & 0.5\%  & $-0.14$ \\
+FSRCNN $4\times$      & 0.01\% & 1.8  & 0.2\%  & $-0.05$ \\
+LapSRN $4\times$      & 0.02\% & 3.7  & 4.7\%  & $-0.69$ \\
+Real-ESRGAN $4\times$ & 10.9\% & 24.2 & 32.3\% & $-0.73$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Is this pressure unique to Real-ESRGAN? Repeating the margin analysis
+at $\alpha = 0.10$ (standard pair) for the three PSNR-oriented models
+under the identical attack wrapper (Table~\ref{tab:mechanism}) shows
+differential perturbation an order of magnitude below the
+$\approx$30-unit enforced margin ($\sigma = 1.8$--$3.7$ vs.\ 24.2 for
+Real-ESRGAN), so essentially no block crosses the decision boundary.
+LapSRN is the instructive intermediate case: its perturbation
+\emph{direction} carries nearly the same restoration signature as
+Real-ESRGAN ($r_{\mathrm{undo}} = -0.69$ vs.\ $-0.73$) at $7\times$
+weaker strength ($k = 4.7\%$ vs.\ 32.3\%), and the few flips these
+models do cause occur exclusively in blocks whose natural ordering
+opposes the embedded bit --- the same signature, in miniature. These
+measurements suggest that a perturbation component directed against
+the embedded coefficient relationship is present across the learned SR
+architectures we test, but only the GAN-trained restoration model is
+strong enough to cross the embedded decision boundary. On current
+evidence, Real-ESRGAN produces substantial degradation while ESPCN,
+FSRCNN, and LapSRN preserve the watermark under the same evaluation
+pipeline: the practical threat is architecture-dependent, not a
+property of ``AI enhancement'' as a category.
+
+\subsection{Stability of the Anti-Complementarity Across Embedding Strengths}
+
+A key question is whether the ESRGAN/JPEG anti-complementarity depends
+on the embedding strength $\alpha$ --- for example, whether stronger
+embedding can shift which positions are most vulnerable. We measure the
+per-position ESRGAN and JPEG DCT damage profiles at all four $\alpha$
+values and compute cross-attack Spearman correlations and cross-$\alpha$
+rank stability for the standard pair.
+
+The ESRGAN/JPEG profile anti-complementarity is essentially constant
+across $\alpha$: $\rho$ ranges from $-0.716$ at $\alpha=0.05$ to
+$-0.706$ at $\alpha=0.30$, a total range of 0.010 over a $6\times$ span
+of embedding strength. The rank ordering of all 64 DCT positions by
+damage magnitude is also stable: Jaccard similarity of the top-10
+most-damaged positions is 1.0 for all cross-$\alpha$ comparisons, for
+both ESRGAN and JPEG independently. This indicates the anti-complementarity
+is a structural property of the two attack types, not of the embedding
+strength. Similarly, Real-ESRGAN damage isotropy (Spearman $r$ between
+damage at symmetric DCT positions) is stable at $r \approx 0.989$
+across all tested $\alpha$ values. The margin analysis of
+Section~\ref{sec:margin} gives this anti-complementarity a mechanistic
+reading: JPEG is an exogenous quantizer whose damage follows its fixed
+quantization table, whereas Real-ESRGAN's damage follows the embedded
+signal itself --- consistent with the two attacks being not merely
+spectrally complementary but mechanistically different kinds of noise,
+which would explain why no static position choice escapes the
+trade-off.
+
+% SOURCE: results/symmetry_summary.csv (src/frequency_sweep.py screening
+%   runs, pipeline P1).
+Separately, symmetric coefficient pairs achieve mean Real-ESRGAN NC of
+0.821 versus 0.689 for asymmetric pairs (43-pair screening set,
+$\alpha=0.1$, 20-image subset), disconfirming coordinate symmetry as
+the cause of Real-ESRGAN vulnerability.
+
+\subsection{Subband Selection Does Not Help}
+% SOURCE: results/comparison_metrics.csv (src/run_comparison.py,
+%   alpha=0.1, 100 images, pipeline P1).
+As a supplementary comparison, we evaluated a DWT-SVD scheme embedding
+in the HH subband at matched imperceptibility (47.7 vs.\ 48.0\,dB
+PSNR, $\alpha=0.1$). It achieves NC of only 0.18 under Gaussian blur
+and JPEG-Q50 and
+0.29 under Real-ESRGAN --- near-chance extraction under attacks
+the DWT-DCT-LL scheme survives at 0.93, 0.98, and 0.74 respectively.
+Moving embedding energy to high-frequency subbands is not a viable
+escape from the enhancement vulnerability.
+
+\subsection{Limitations}
+Our evaluation covers four learned super-resolution architectures
+(ESPCN, FSRCNN, LapSRN, Real-ESRGAN); within this set the destructive
+behavior is confined to the GAN-trained restoration model, but
+diffusion-based enhancers and other GAN restorers remain untested, and
+the margin analysis is reported at a single embedding strength
+($\alpha=0.10$), and the balanced-pair like-for-like control
+(Section~\ref{sec:pairs}) remains $n=20$ pending the camera-ready
+rerun. All headline results are for one
+classical scheme (DWT-DCT with ordering-based bit encoding);
+generalization to other classical schemes remains to be established.
+The Pareto analysis uses proxy scores (damage-profile-based E-score and
+J-score) rather than end-to-end NC; the margin analysis of
+Section~\ref{sec:margin} suggests \emph{why} such proxies mispredict
+for generative attacks (they model a signal-dependent attack as
+exogenous noise), and the candidate selection rule --- minimize the
+natural margin $|M_{\mathrm{orig}}|$ --- has not yet been validated
+prospectively on new pairs.
+
+\section{Conclusion}
+\label{sec:conclusion}
+
+We investigated whether AI-based image enhancement violates the
+quality--attack tradeoff underlying classical watermark robustness
+evaluation, and found that it can: Real-ESRGAN degrades DWT-DCT
+watermark recovery to NC $= 0.795$ while producing the highest
+perceptual quality (SSIM 0.885) of any watermark-degrading attack
+tested, while ESPCN, FSRCNN, and LapSRN --- sharing the identical
+resampling pipeline --- leave watermarks intact.
+The proximate mechanism is a DC-concentrated perturbation profile
+fundamentally unlike JPEG's uniform profile, with strongly
+anti-complementary position rankings ($\rho \approx -0.7$ to $-0.9$).
+A 307,200-block decision-margin analysis shows that what governs
+survival is the \emph{differential perturbation of the embedded
+coefficient pair}, not absolute coefficient stability: the perturbation
+removes 30--53\% of the embedded coefficient differential and moves
+each block toward its natural coefficient ordering --- consistent with
+learned restoration reducing the artificial coefficient relationships
+introduced by comparison-based embedding --- so that failures
+concentrate (risk ratio 3.4--9.5$\times$) where the natural ordering
+opposes the embedded bit. PSNR-oriented super-resolution models show
+the same perturbation direction at an order of magnitude lower
+strength, leaving watermarks intact: on current evidence the threat is
+architecture-dependent, not a property of learned enhancement as a
+category. An exhaustive search over 1,953 coefficient pairs confirms
+that the JPEG/ESRGAN anti-complementarity is reflected in end-to-end
+NC: no pair simultaneously maximizes Real-ESRGAN and JPEG robustness,
+and the anti-complementarity is stable across embedding strengths
+$\alpha \in \{0.05, 0.10, 0.20, 0.30\}$, consistent with its origin in
+the exogenous-vs-endogenous character of the two attacks rather than
+in tuning.
+
+Content owners relying on DWT-DCT watermarking should be aware that
+consumer enhancement tools built on GAN-trained restoration can
+silently degrade watermark integrity, while common PSNR-oriented
+super-resolvers do not. Attack-aware coefficient selection offers
+partial mitigation: the high-frequency pair $(7,5)/(7,7)$ improves
+Real-ESRGAN NC from 0.795 to 0.831 and eliminates imperceptibility
+failures at the cost of JPEG NC (0.996 to 0.902), and the margin
+analysis suggests an explanation for its advantage --- near-zero
+natural margins leave a restoration-type attack little to restore ---
+yielding a candidate selection rule (minimize natural
+$|M_{\mathrm{orig}}|$) in place of per-position damage heuristics. Future work should validate this rule
+prospectively, extend the evaluation to diffusion-based enhancers and
+additional GAN restorers, and investigate content-adaptive strategies
+that jointly optimize coefficient selection and embedding against both
+exogenous and endogenous attack types.
+
+\section*{Acknowledgment}
+The author used Claude (Anthropic) as an AI coding assistant for
+pipeline implementation. All experimental design, analysis, and writing
+are the author's own work.
+
+\bibliographystyle{IEEEtran}
+\bibliography{references_revised}
+
+\end{document}
