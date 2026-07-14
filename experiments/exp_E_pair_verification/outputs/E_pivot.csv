@@ -1,0 +1,13 @@
+pair_label,attack,mean,std,count
+"balanced (2,3)/(3,2)",gaussian_blur_5x5,0.9548828125,0.03798122971213347,30
+"balanced (2,3)/(3,2)",jpeg_compression_q50,0.996484375,0.006034121948880843,30
+"balanced (2,3)/(3,2)",real_esrgan,,,0
+"near-sym (1,2)/(2,1)",gaussian_blur_5x5,0.9370442708333333,0.04829772084779658,30
+"near-sym (1,2)/(2,1)",jpeg_compression_q50,0.9946614583333333,0.008473724257005558,30
+"near-sym (1,2)/(2,1)",real_esrgan,,,0
+"standard (4,1)/(1,4)",gaussian_blur_5x5,0.9278645833333333,0.049298471002863636,30
+"standard (4,1)/(1,4)",jpeg_compression_q50,0.9899739583333333,0.034222411465001774,30
+"standard (4,1)/(1,4)",real_esrgan,,,0
+"swept (7,5)/(7,7)",gaussian_blur_5x5,0.9799479166666667,0.023947911471691282,30
+"swept (7,5)/(7,7)",jpeg_compression_q50,0.8822265625,0.08963729265251116,30
+"swept (7,5)/(7,7)",real_esrgan,,,0

@@ -1,0 +1,46 @@
+======================================================================
+EXPERIMENT C: COEFFICIENT SELECTION DESIGN PRINCIPLES — SUMMARY
+======================================================================
+
+CORE FINDING:
+  Two predictors independently explain ESRGAN NC:
+  1. Combined ESRGAN damage: Spearman ρ=-0.6907
+  2. Stability differential:  Spearman ρ=-0.7729
+  3. Symmetry class:          Spearman ρ=0.4835
+
+  For JPEG Q50:
+  Combined ESRGAN damage predicts JPEG NC:  ρ=0.7076
+  (shared predictor structure — not attack-specific)
+
+DESIGN RULES (empirically derived):
+  Rule 1: Minimize combined damage (both coefficients in stable zone)
+  Rule 2: Prefer symmetric pairs (leverage ESRGAN isotropy)
+  Rule 3: Avoid positions (4,1) and (1,4) specifically — anomalously
+           damaged by ESRGAN despite being symmetric
+  Rule 4: Low frequency radius sum correlated with higher stability
+
+  Best performing pair: (7,5)/(7,7)
+    NC (ESRGAN): 0.8641
+    NC (JPEG):   0.8932
+    Symmetry:    near-symmetric
+    Combined damage: 6.243
+
+  Standard pair (4,1)/(1,4) NC (ESRGAN): 0.8233
+  Best pair improvement:    +0.0407
+
+NOVELTY ASSESSMENT: HIGH
+  The joint stability + symmetry design rule is a directly actionable
+  contribution. Prior work selects embedding positions based on
+  perceptual criteria or single-attack stability — not the joint
+  stability + isotropy-symmetry interaction revealed here.
+
+LIMITATIONS:
+  1. Stability data from single attack run (not cross-validated across α)
+  2. 43 candidate pairs — not exhaustive search of all 64C2=2016 pairs
+  3. Stability matrix averaged over 100 images — may vary for specific content
+
+PAPER IMPLICATION:
+  This forms the core recommendation section: select coefficient pairs
+  satisfying (joint stability < threshold) AND (symmetry class ≥ near-sym)
+  for AI-robust DWT-DCT watermarking.
+======================================================================

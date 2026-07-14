@@ -1,0 +1,44 @@
+======================================================================
+EXPERIMENT D: EXHAUSTIVE OPTIMIZATION — SUMMARY
+======================================================================
+
+SCOPE: All C(63,2) = 1953 non-DC coefficient pairs
+METHOD: Analytical scoring using ESRGAN stability + JPEG quantization table
+
+KEY FINDING: FUNDAMENTAL ESRGAN-JPEG TRADE-OFF
+  ESRGAN stability  ~ (r,c) inverse of damage matrix
+  JPEG stability     ~ (r,c) inverse of JPEG quantization table
+  The JPEG quantization matrix IS CORRELATED with ESRGAN damage
+  but in OPPOSITE DIRECTION: high-freq positions that are JPEG-bad
+  happen to be ESRGAN-GOOD and vice versa.
+  -> This creates an irreducible frequency-space trade-off.
+
+TOP-5 PAIRS BY COMBINED SCORE (balanced ESRGAN + JPEG):
+  (2, 3)     / (3, 2)      |  sym=symmetric       |  E-score=0.8183  J-score=0.8864  |  E-dmg=8.84  Q=46
+  (2, 4)     / (4, 2)      |  sym=symmetric       |  E-score=0.8537  J-score=0.7455  |  E-dmg=8.32  Q=77
+  (1, 3)     / (3, 1)      |  sym=symmetric       |  E-score=0.7494  J-score=0.9318  |  E-dmg=9.84  Q=36
+  (1, 5)     / (5, 1)      |  sym=symmetric       |  E-score=0.8596  J-score=0.6727  |  E-dmg=8.23  Q=93
+  (2, 5)     / (5, 2)      |  sym=symmetric       |  E-score=0.9014  J-score=0.5864  |  E-dmg=7.62  Q=112
+
+PARETO FRONTIER: 37 pairs achieve a Pareto-optimal balance
+
+STANDARD PAIR (4,1)/(1,4) POSITION ON TRADE-OFF FRONTIER:
+  E-score=0.0278  J-score=0.8773  Combined=0.3799
+  NOT Pareto-optimal — intermediate position, neither ESRGAN-optimal nor JPEG-optimal
+
+DESIGN IMPLICATION:
+  For JPEG+ESRGAN balanced robustness: target positions in the
+  low-to-mid ESRGAN damage zone AND low JPEG Q-step zone.
+  This region is roughly (2-5, 2-5) in the DCT grid.
+  Symmetric pairs in this zone are analytically predicted to be
+  best for AI enhancement robustness.
+
+REVIEWER OBJECTION ADDRESSED:
+  Prior exp (43 pairs) was non-exhaustive. This experiment covers
+  all 1953 possible pairs analytically, identifying the globally
+  optimal region without needing full empirical re-sweep.
+
+LIMITATION:
+  Analytical prediction uses stability data from one experiment.
+  Verification on held-out images is needed for full validation.
+======================================================================

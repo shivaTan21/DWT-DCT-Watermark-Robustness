@@ -1,0 +1,43 @@
+======================================================================
+EXPERIMENT B: MULTI-FEATURE NC PREDICTOR — SUMMARY
+======================================================================
+
+HYPOTHESIS:
+  Per-image NC under Real-ESRGAN can be predicted from image
+  statistics computed BEFORE watermark embedding.
+
+KEY FINDINGS:
+  ll_spectral_entropy         : r=0.5327**, ρ=0.5699
+  local_std_cv                : r=-0.4770**, ρ=-0.5052
+  edge_density                : r=0.4592**, ρ=0.4585
+
+  Cross-Validated NC Prediction (5-fold):
+    Ridge (α=1.0)       : R²=0.3663 ± 0.1979, MAE=0.0702
+    Ridge (α=0.1)       : R²=0.3767 ± 0.2560, MAE=0.0673
+    Random Forest       : R²=0.3064 ± 0.0588, MAE=0.0779
+    GradBoost           : R²=0.1535 ± 0.1496, MAE=0.0821
+
+  Best model: Ridge (α=0.1) (CV R²=0.3767)
+
+  Predictive power: MODERATE: R²>0.3 — meaningful but not reliable for individual images
+
+INTERPRETATION:
+  The most predictive features are those related to texture complexity
+  and local frequency content. This suggests that images with
+  heterogeneous texture (mixed smooth and textured regions) are harder
+  to predict and may produce more variable NC across blocks.
+
+NOVELTY ASSESSMENT: MEDIUM
+  Predicting watermark robustness from image features before embedding
+  is a practical contribution. Prior work focuses on post-attack analysis.
+
+LIMITATIONS:
+  1. Dataset size (n≈100) limits statistical power for multi-feature models
+  2. All images are natural photographs (Kodak + TAMPERE17); synthetic
+     or document images may behave differently
+  3. Model trained on standard embedding only (α=0.1)
+
+RECOMMENDED FOLLOW-UP:
+  Use NC predictor to select adaptive embedding strength α per image,
+  then verify that predicted-difficult images improve more under higher α.
+======================================================================

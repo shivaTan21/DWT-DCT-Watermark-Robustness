@@ -1,0 +1,43 @@
+# environments / editor / OS
+.venv/
+__pycache__/
+*.pyc
+.DS_Store
+.idea/
+
+# regenerable image caches (multi-GB; recreated by the experiment scripts)
+data/processed_images/*
+results/watermarked/
+results/attacked/
+experiments/exp_H_margin_analysis/watermarked_balanced/
+experiments/exp_H_margin_analysis/esrgan_balanced/
+experiments/exp_H_margin_analysis/esrgan_standard_control/
+experiments/exp_H_margin_analysis/esrgan_hf_control/
+experiments/exp_I_sr_model_generalization/attacked/
+
+# oversized block-level CSVs (approach/exceed GitHub's 100 MB limit;
+# regenerable via run_exp_H.py / analyze_exp_I.py)
+experiments/exp_H_margin_analysis/block_margins.csv
+experiments/exp_I_sr_model_generalization/block_margins_exp_I.csv
+
+# source images: re-download with src/download_images.py
+data/original_images/
+data/models/
+
+# model weights: RealESRGAN/SwinIR .pth and EDSR .pb are re-downloadable
+# (see README / src/attacks_ai.py / src/attacks_sr_generalization.py);
+# the small OpenCV .pb models are kept in-repo.
+weights/*
+!weights/ESPCN_x4.pb
+!weights/FSRCNN_x4.pb
+!weights/LapSRN_x4.pb
+
+# LaTeX build artifacts
+paper/*.aux
+paper/*.log
+paper/*.blg
+paper/*.out
+
+!data/processed_images/.gitkeep
+!results/watermarked/.gitkeep
+!results/plots/.gitkeep

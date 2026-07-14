@@ -1,0 +1,32 @@
+======================================================================
+EXPERIMENT E: PAIR VERIFICATION SUMMARY
+======================================================================
+
+STANDARD PAIR (4,1)/(1,4):
+  ESRGAN NC = nan
+
+CANDIDATE PAIRS vs STANDARD:
+
+  balanced (2,3)/(3,2):
+    Description: Analytically predicted global optimum (D: sym, E=0.818, J=0.886)
+    ESRGAN NC: nan (Δ=+nan)
+    JPEG NC:   0.9965
+
+  swept (7,5)/(7,7):
+    Description: Best from empirical sweep (C: near-sym, NC_ESRGAN=0.864)
+    ESRGAN NC: nan (Δ=+nan)
+    JPEG NC:   0.8822
+
+  near-sym (1,2)/(2,1):
+    Description: Pareto on sweep: sym, NC_ESRGAN=0.793 NC_JPEG=0.995
+    ESRGAN NC: nan (Δ=+nan)
+    JPEG NC:   0.9947
+
+CONCLUSION:
+  Does analytical prediction transfer to held-out images?
+  See numerical results above.
+
+PAPER IMPLICATION:
+  If (2,3)/(3,2) matches or exceeds standard pair on ESRGAN while
+  maintaining JPEG NC, this confirms the design principles.
+======================================================================

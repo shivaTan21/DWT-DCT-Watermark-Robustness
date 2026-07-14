@@ -1,0 +1,18 @@
+numpy
+opencv-python
+PyWavelets
+scipy
+scikit-image
+pandas
+matplotlib
+
+# --- Optional: AI-based enhancement attacks -----------------------------
+# Real-ESRGAN backend (also needs a .pth model file, see README):
+# torch
+# py-real-esrgan
+#
+# OpenCV DNN super-resolution backend (also needs a pretrained .pb model):
+# NOTE: opencv-contrib-python provides the same `cv2` module as
+# opencv-python and will conflict with it. Uninstall opencv-python first
+# if you want cv2.dnn_superres:
+# opencv-contrib-python

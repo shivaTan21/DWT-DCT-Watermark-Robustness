@@ -1,0 +1,112 @@
+Images: 100 | control subset: 20
+  ESRGAN loaded on mps
+[1/100] kodim01  standard: NC=0.7383 flips=0.131  balanced: NC=0.6973 flips=0.151  hf: NC=0.8887 flips=0.056  standard_live: NC=0.5977 flips=0.201
+[2/100] kodim02  standard: NC=0.7891 flips=0.105  balanced: NC=0.6328 flips=0.184  hf: NC=0.8535 flips=0.073  standard_live: NC=0.6172 flips=0.191
+[3/100] kodim03  standard: NC=0.8477 flips=0.076  balanced: NC=0.7969 flips=0.102  hf: NC=0.8770 flips=0.062  standard_live: NC=0.7617 flips=0.119
+[4/100] kodim04  standard: NC=0.8145 flips=0.093  balanced: NC=0.7480 flips=0.125  hf: NC=0.8984 flips=0.051  standard_live: NC=0.7285 flips=0.136
+[5/100] kodim05  standard: NC=0.8223 flips=0.089  balanced: NC=0.7441 flips=0.127  hf: NC=0.8340 flips=0.083  standard_live: NC=0.7773 flips=0.111
+[6/100] kodim06  standard: NC=0.8301 flips=0.083  balanced: NC=0.6797 flips=0.159  hf: NC=0.9258 flips=0.037  standard_live: NC=0.6562 flips=0.170
+[7/100] kodim07  standard: NC=0.6934 flips=0.153  balanced: NC=0.6172 flips=0.191  hf: NC=0.8320 flips=0.084  standard_live: NC=0.5801 flips=0.210
+[8/100] kodim08  standard: NC=0.5273 flips=0.236  balanced: NC=0.4727 flips=0.264  hf: NC=0.6582 flips=0.171  standard_live: NC=0.4727 flips=0.264
+[9/100] kodim09  standard: NC=0.7559 flips=0.122  balanced: NC=0.6387 flips=0.181  hf: NC=0.8281 flips=0.086  standard_live: NC=0.6660 flips=0.167
+[10/100] kodim10  standard: NC=0.7363 flips=0.131  balanced: NC=0.6855 flips=0.157  hf: NC=0.8320 flips=0.084  standard_live: NC=0.5879 flips=0.205
+[11/100] kodim11  standard: NC=0.8496 flips=0.075  balanced: NC=0.7383 flips=0.131  hf: NC=0.9297 flips=0.035  standard_live: NC=0.7402 flips=0.130
+[12/100] kodim12  standard: NC=0.8887 flips=0.056  balanced: NC=0.7109 flips=0.145  hf: NC=0.9258 flips=0.037  standard_live: NC=0.7598 flips=0.120
+[13/100] kodim13  standard: NC=0.9121 flips=0.043  balanced: NC=0.8340 flips=0.083  hf: NC=0.9551 flips=0.022  standard_live: NC=0.7930 flips=0.103
+[14/100] kodim14  standard: NC=0.8828 flips=0.059  balanced: NC=0.8867 flips=0.057  hf: NC=0.9258 flips=0.037  standard_live: NC=0.8594 flips=0.070
+[15/100] kodim15  standard: NC=0.7910 flips=0.101  balanced: NC=0.6523 flips=0.172  hf: NC=0.9004 flips=0.050  standard_live: NC=0.6504 flips=0.171
+[16/100] kodim16  standard: NC=0.9082 flips=0.046  balanced: NC=0.7754 flips=0.112  hf: NC=0.9043 flips=0.048  standard_live: NC=0.7500 flips=0.125
+[17/100] kodim17  standard: NC=0.9277 flips=0.036  balanced: NC=0.8867 flips=0.057  hf: NC=0.9590 flips=0.021  standard_live: NC=0.8906 flips=0.055
+[18/100] kodim18  standard: NC=0.9375 flips=0.030  balanced: NC=0.8652 flips=0.066  hf: NC=0.9375 flips=0.031  standard_live: NC=0.8613 flips=0.068
+[19/100] kodim19  standard: NC=0.8340 flips=0.083  balanced: NC=0.7754 flips=0.112  hf: NC=0.8906 flips=0.055  standard_live: NC=0.7637 flips=0.118
+[20/100] kodim20  standard: NC=0.4551 flips=0.308  balanced: NC=0.4473 flips=0.312  hf: NC=0.5273 flips=0.242  standard_live: NC=0.3809 flips=0.343
+[21/100] kodim21  standard: NC=0.7598 flips=0.119  balanced: NC=0.7051 flips=0.147  hf: NC=0.7676 flips=0.116
+[22/100] kodim22  standard: NC=0.9121 flips=0.044  balanced: NC=0.8184 flips=0.091  hf: NC=0.9512 flips=0.024
+[23/100] kodim23  standard: NC=0.8379 flips=0.081  balanced: NC=0.8398 flips=0.080  hf: NC=0.8457 flips=0.077
+[24/100] kodim24  standard: NC=0.7969 flips=0.100  balanced: NC=0.7031 flips=0.146  hf: NC=0.8086 flips=0.095
+[25/100] t001  standard: NC=0.7793 flips=0.110  balanced: NC=0.7500 flips=0.125  hf: NC=0.8184 flips=0.091
+[26/100] t002  standard: NC=0.6582 flips=0.171  balanced: NC=0.5332 flips=0.233  hf: NC=0.8047 flips=0.098
+[27/100] t003  standard: NC=0.7344 flips=0.133  balanced: NC=0.6934 flips=0.153  hf: NC=0.8516 flips=0.074
+[28/100] t004  standard: NC=0.5625 flips=0.219  balanced: NC=0.4805 flips=0.260  hf: NC=0.7188 flips=0.141
+[29/100] t005  standard: NC=0.8164 flips=0.092  balanced: NC=0.6797 flips=0.160  hf: NC=0.8965 flips=0.052
+[30/100] t006  standard: NC=0.8008 flips=0.100  balanced: NC=0.6172 flips=0.191  hf: NC=0.8594 flips=0.070
+[31/100] t007  standard: NC=0.8340 flips=0.083  balanced: NC=0.6250 flips=0.188  hf: NC=0.7715 flips=0.114
+[32/100] t008  standard: NC=0.7852 flips=0.107  balanced: NC=0.5801 flips=0.210  hf: NC=0.7305 flips=0.135
+[33/100] t009  standard: NC=0.6172 flips=0.192  balanced: NC=0.5781 flips=0.212  hf: NC=0.6348 flips=0.183
+[34/100] t010  standard: NC=0.7188 flips=0.141  balanced: NC=0.6641 flips=0.168  hf: NC=0.7793 flips=0.110
+[35/100] t011  standard: NC=0.7910 flips=0.104  balanced: NC=0.6816 flips=0.159  hf: NC=0.7891 flips=0.105
+[36/100] t012  standard: NC=0.7793 flips=0.110  balanced: NC=0.6680 flips=0.166  hf: NC=0.7285 flips=0.136
+[37/100] t013  standard: NC=0.9785 flips=0.011  balanced: NC=0.9023 flips=0.049  hf: NC=0.9883 flips=0.006
+[38/100] t014  standard: NC=0.7227 flips=0.139  balanced: NC=0.5840 flips=0.208  hf: NC=0.7520 flips=0.124
+[39/100] t015  standard: NC=0.5430 flips=0.229  balanced: NC=0.4336 flips=0.283  hf: NC=0.5938 flips=0.203
+[40/100] t016  standard: NC=0.7559 flips=0.122  balanced: NC=0.6445 flips=0.178  hf: NC=0.8320 flips=0.084
+[41/100] t017  standard: NC=0.9551 flips=0.022  balanced: NC=0.8984 flips=0.051  hf: NC=0.9844 flips=0.008
+[42/100] t018  standard: NC=0.6816 flips=0.159  balanced: NC=0.6543 flips=0.173  hf: NC=0.7852 flips=0.107
+[43/100] t019  standard: NC=0.6348 flips=0.183  balanced: NC=0.5508 flips=0.225  hf: NC=0.7812 flips=0.109
+[44/100] t020  standard: NC=0.7285 flips=0.136  balanced: NC=0.6836 flips=0.158  hf: NC=0.8301 flips=0.085
+[45/100] t021  standard: NC=0.6367 flips=0.182  balanced: NC=0.5898 flips=0.205  hf: NC=0.8203 flips=0.090
+[46/100] t022  standard: NC=0.9082 flips=0.046  balanced: NC=0.8574 flips=0.071  hf: NC=0.9883 flips=0.006
+[47/100] t023  standard: NC=0.8262 flips=0.087  balanced: NC=0.6445 flips=0.178  hf: NC=0.8906 flips=0.055
+[48/100] t024  standard: NC=0.6406 flips=0.180  balanced: NC=0.5234 flips=0.238  hf: NC=0.6484 flips=0.176
+[49/100] t025  standard: NC=0.6035 flips=0.198  balanced: NC=0.3906 flips=0.305  hf: NC=0.7129 flips=0.144
+[50/100] t026  standard: NC=0.6406 flips=0.180  balanced: NC=0.6426 flips=0.179  hf: NC=0.6816 flips=0.159
+[51/100] t027  standard: NC=0.8242 flips=0.088  balanced: NC=0.5879 flips=0.206  hf: NC=0.8457 flips=0.077
+[52/100] t028  standard: NC=0.4902 flips=0.255  balanced: NC=0.4082 flips=0.296  hf: NC=0.6562 flips=0.172
+[53/100] t029  standard: NC=0.9043 flips=0.048  balanced: NC=0.7930 flips=0.104  hf: NC=0.9238 flips=0.038
+[54/100] t030  standard: NC=0.6816 flips=0.159  balanced: NC=0.5254 flips=0.237  hf: NC=0.7812 flips=0.109
+[55/100] t031  standard: NC=0.6484 flips=0.176  balanced: NC=0.6250 flips=0.188  hf: NC=0.6875 flips=0.156
+[56/100] t032  standard: NC=0.6211 flips=0.189  balanced: NC=0.5215 flips=0.239  hf: NC=0.6387 flips=0.181
+[57/100] t033  standard: NC=0.7520 flips=0.124  balanced: NC=0.5742 flips=0.213  hf: NC=0.7637 flips=0.118
+[58/100] t034  standard: NC=0.9512 flips=0.024  balanced: NC=0.8594 flips=0.070  hf: NC=0.9668 flips=0.017
+[59/100] t035  standard: NC=0.6367 flips=0.182  balanced: NC=0.5020 flips=0.249  hf: NC=0.7871 flips=0.106
+[60/100] t036  standard: NC=0.8750 flips=0.062  balanced: NC=0.7715 flips=0.114  hf: NC=0.9277 flips=0.036
+[61/100] t037  standard: NC=0.8418 flips=0.079  balanced: NC=0.7344 flips=0.133  hf: NC=0.8613 flips=0.069
+[62/100] t038  standard: NC=0.8574 flips=0.071  balanced: NC=0.6602 flips=0.170  hf: NC=0.8691 flips=0.065
+[63/100] t039  standard: NC=0.6230 flips=0.188  balanced: NC=0.4102 flips=0.294  hf: NC=0.7285 flips=0.136
+[64/100] t040  standard: NC=0.9219 flips=0.039  balanced: NC=0.8496 flips=0.075  hf: NC=0.9473 flips=0.026
+[65/100] t041  standard: NC=0.8457 flips=0.077  balanced: NC=0.7148 flips=0.143  hf: NC=0.9082 flips=0.046
+[66/100] t042  standard: NC=0.8086 flips=0.103  balanced: NC=0.7344 flips=0.140  hf: NC=0.8672 flips=0.070
+[67/100] t043  standard: NC=0.8418 flips=0.079  balanced: NC=0.6875 flips=0.156  hf: NC=0.9121 flips=0.044
+[68/100] t044  standard: NC=0.6172 flips=0.191  balanced: NC=0.5508 flips=0.225  hf: NC=0.6406 flips=0.180
+[69/100] t045  standard: NC=0.9121 flips=0.044  balanced: NC=0.7852 flips=0.107  hf: NC=0.9473 flips=0.026
+[70/100] t046  standard: NC=0.8926 flips=0.054  balanced: NC=0.7891 flips=0.105  hf: NC=0.9199 flips=0.040
+[71/100] t047  standard: NC=0.9414 flips=0.029  balanced: NC=0.8066 flips=0.097  hf: NC=0.9531 flips=0.023
+[72/100] t048  standard: NC=0.8086 flips=0.096  balanced: NC=0.5703 flips=0.215  hf: NC=0.7480 flips=0.126
+[73/100] t049  standard: NC=0.9316 flips=0.034  balanced: NC=0.8496 flips=0.075  hf: NC=0.9492 flips=0.025
+[74/100] t050  standard: NC=0.8965 flips=0.052  balanced: NC=0.7773 flips=0.111  hf: NC=0.9414 flips=0.029
+[75/100] t051  standard: NC=0.8105 flips=0.095  balanced: NC=0.6836 flips=0.158  hf: NC=0.8730 flips=0.063
+[76/100] t052  standard: NC=0.7461 flips=0.134  balanced: NC=0.6504 flips=0.181  hf: NC=0.8418 flips=0.081
+[77/100] t053  standard: NC=0.9160 flips=0.042  balanced: NC=0.7559 flips=0.122  hf: NC=0.9355 flips=0.032
+[78/100] t054  standard: NC=0.6465 flips=0.177  balanced: NC=0.1406 flips=0.430  hf: NC=0.7637 flips=0.118
+[79/100] t055  standard: NC=0.8789 flips=0.061  balanced: NC=0.8125 flips=0.094  hf: NC=0.9062 flips=0.047
+[80/100] t056  standard: NC=0.9609 flips=0.020  balanced: NC=0.7988 flips=0.101  hf: NC=0.9648 flips=0.018
+[81/100] t057  standard: NC=0.6953 flips=0.152  balanced: NC=0.6152 flips=0.192  hf: NC=0.7969 flips=0.102
+[82/100] t058  standard: NC=0.8652 flips=0.067  balanced: NC=0.7207 flips=0.140  hf: NC=0.8457 flips=0.077
+[83/100] t059  standard: NC=0.7871 flips=0.105  balanced: NC=0.6992 flips=0.149  hf: NC=0.8477 flips=0.076
+[84/100] t060  standard: NC=0.7910 flips=0.104  balanced: NC=0.6953 flips=0.152  hf: NC=0.7285 flips=0.136
+[85/100] t061  standard: NC=0.7578 flips=0.121  balanced: NC=0.7383 flips=0.131  hf: NC=0.8398 flips=0.080
+[86/100] t062  standard: NC=0.8066 flips=0.097  balanced: NC=0.7266 flips=0.137  hf: NC=0.7402 flips=0.130
+[87/100] t063  standard: NC=0.6562 flips=0.172  balanced: NC=0.5625 flips=0.219  hf: NC=0.7793 flips=0.110
+[88/100] t064  standard: NC=0.5176 flips=0.241  balanced: NC=0.4805 flips=0.260  hf: NC=0.5527 flips=0.224
+[89/100] t065  standard: NC=0.8789 flips=0.061  balanced: NC=0.7090 flips=0.146  hf: NC=0.9297 flips=0.035
+[90/100] t066  standard: NC=0.9082 flips=0.046  balanced: NC=0.7500 flips=0.125  hf: NC=0.9609 flips=0.020
+[91/100] t067  standard: NC=0.6230 flips=0.188  balanced: NC=0.6152 flips=0.192  hf: NC=0.6914 flips=0.154
+[92/100] t068  standard: NC=0.7695 flips=0.115  balanced: NC=0.7715 flips=0.114  hf: NC=0.7949 flips=0.103
+[93/100] t069  standard: NC=0.6328 flips=0.184  balanced: NC=0.5566 flips=0.222  hf: NC=0.6309 flips=0.185
+[94/100] t070  standard: NC=0.8770 flips=0.062  balanced: NC=0.7930 flips=0.104  hf: NC=0.9199 flips=0.040
+[95/100] t071  standard: NC=0.6094 flips=0.195  balanced: NC=0.5488 flips=0.226  hf: NC=0.6133 flips=0.193
+[96/100] t072  standard: NC=0.9844 flips=0.008  balanced: NC=0.9570 flips=0.021  hf: NC=0.9707 flips=0.015
+[97/100] t073  standard: NC=0.9805 flips=0.010  balanced: NC=0.8691 flips=0.065  hf: NC=0.9746 flips=0.013
+[98/100] t074  standard: NC=0.9551 flips=0.022  balanced: NC=0.9160 flips=0.042  hf: NC=0.9238 flips=0.038
+[99/100] t075  standard: NC=0.8203 flips=0.090  balanced: NC=0.8008 flips=0.100  hf: NC=0.8574 flips=0.071
+[100/100] t076  standard: NC=0.9453 flips=0.027  balanced: NC=0.9062 flips=0.047  hf: NC=0.9219 flips=0.039
+
+Done.
+
+Mean NC by pair (should match Exp F within PNG quantization):
+                   nc  flip_rate  mean_abs_m_before  mean_abs_diff_pert
+pair                                                                   
+balanced       0.6826     0.1591            38.8484             22.9631
+hf             0.8311     0.0846            31.0362             20.5542
+standard       0.7833     0.1087            38.5056             19.8345
+standard_live  0.6947     0.1539            36.9067             21.6971
