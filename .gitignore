@@ -41,3 +41,4 @@ paper/*.out
 !data/processed_images/.gitkeep
 !results/watermarked/.gitkeep
 !results/plots/.gitkeep
+experiments/exp_J_balanced_like_for_like/attacked_esrgan/

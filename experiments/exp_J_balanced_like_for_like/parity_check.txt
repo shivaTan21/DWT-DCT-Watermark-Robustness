@@ -1,0 +1,7 @@
+Parity check: canonical pipeline vs frozen disk files
+date: 2026-07-14 03:13:01
+
+[standard] kodim01 alpha=0.1: watermarked bit-identical=True, real_esrgan bit-identical=True
+[hf] kodim01 alpha=0.1: watermarked bit-identical=True, real_esrgan bit-identical=True
+
+RESULT: PASS — the live canonical pipeline is bit-identical to the pipeline that produced the frozen standard/HF files.
